@@ -1,4 +1,5 @@
 {
-    "Users": ["UserA","UserB"],
-    "Groups": ["GroupA"]
-}
+    "bind_ip": ":",
+    "bind_port": "3004"
+  }
+  
