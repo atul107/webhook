@@ -53,7 +53,7 @@ go run .
 
 - Headers
   - Type - `map[string]string`
-  - Reason - We need to add headers to post request so have parse it in key and value pair
+  - Reason - To add headers to webhook post request in key and value pair
 
 ## Persistance Storage
 
@@ -62,4 +62,4 @@ go run .
 
 ## Retry of Retrival errors
 
-If webhook server gets response with following status `502`, `503`, `504`, function will try to call endpoint again untill it get any other status, either success or faliure.
+Two values will be taken from config file, `retry_attempt` and `retry_interval`, which will be used for retrying webhook requests in case of failure.

@@ -1,5 +1,7 @@
 {
-    "bind_ip": ":",
-    "bind_port": "3005"
+    "bind_ip": "",
+    "bind_port": "3005",
+    "retry_attempt": 2,
+    "retry_interval": 2
   }
   

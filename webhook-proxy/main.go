@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+var config Config
+
 func main() {
 	/**
 	*	Reading Configruation
@@ -15,7 +17,7 @@ func main() {
 		log.Fatalf("error opening file: %v", err)
 	}
 	defer file.Close()
-	config := readConfig(file)
+	config = readConfig(file)
 	fmt.Println("Server running on", config.BindIp, config.BindPort)
 
 	/**
@@ -31,5 +33,5 @@ func main() {
 	/**
 	*	Server
 	 */
-	startServer(config.BindIp, config.BindPort)
+	startServer()
 }

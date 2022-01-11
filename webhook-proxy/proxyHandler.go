@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 //structure for response body
@@ -15,18 +16,6 @@ type postBody struct {
 	Url     string            `json:"url"`
 	Payload json.RawMessage   `json:"payload"`
 	Headers map[string]string `json:"headers"`
-}
-
-//checks for retriable errors
-func checkRetry(status int) bool {
-	validStatus := [3]int{502, 503, 504}
-	for _, v := range validStatus {
-		if status == v {
-			log.Println("Retry Tried")
-			return true
-		}
-	}
-	return false
 }
 
 // Parse Request Json Body
@@ -95,35 +84,29 @@ func proxy(w http.ResponseWriter, r *http.Request) {
 
 		// Calling Webhook
 		client := &http.Client{}
-		resp, err := client.Do(req)
+		var resp *http.Response
+		err = retry(config.RetryAttemp, (config.RetryInterval)*time.Second, func() (err error) {
+			resp, err = client.Do(req)
+			return
+		})
+
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Bad Response"))
-			log.Println("Bad Response")
+			w.Write([]byte(string(err.Error())))
+			log.Println(err)
 			return
 		}
 		defer resp.Body.Close()
-
-		//Performs one Retry for retriable errors
-		for checkRetry(resp.StatusCode) {
-			resp, err = client.Do(req)
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte("Bad Response"))
-				log.Println("Bad Response")
-				break
-			}
-		}
 
 		// Success and Failure Messages
 		if resp.StatusCode == 200 {
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte("200 - Success Response"))
-			log.Println("Success Response")
+			log.Println("Success Response from webhook")
 		} else {
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Bad Response"))
-			log.Println("Bad Response")
+			w.Write([]byte("Bad Response from webhook"))
+			log.Println("Bad Response from webhook")
 		}
 
 	default:
