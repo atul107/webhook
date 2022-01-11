@@ -16,7 +16,7 @@ func main() {
 	}
 	defer file.Close()
 	config := readConfig(file)
-	fmt.Println(config)
+	fmt.Println("Server running on", config.BindIp, config.BindPort)
 
 	/**
 	*	Persistance storage in file

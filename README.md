@@ -7,7 +7,7 @@ A service for calling webhooks
 ## Start the proxy server
 
 ```
-go run main.go
+go run .
 ```
 
 ## Endpoints and Methods
@@ -62,4 +62,4 @@ go run main.go
 
 ## Retry of Retrival errors
 
-If we get webhook response with following status `502`, `503`, `504`, function will call try to call endpoint again uptill we get any other status, either success or faliure.
+If webhook server gets response with following status `502`, `503`, `504`, function will try to call endpoint again untill it get any other status, either success or faliure.

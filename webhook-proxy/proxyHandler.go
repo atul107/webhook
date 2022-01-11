@@ -69,13 +69,19 @@ func proxy(w http.ResponseWriter, r *http.Request) {
 		// Parse Body
 		t, err := parseJsonBody(r.Body)
 		if err != nil {
-			panic(err)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Bad body format!"))
+			log.Println("Bad body format!")
+			return
 		}
 
 		// Url check
 		_, err = url.ParseRequestURI(t.Url)
 		if err != nil {
-			panic(err)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Incorrect Url!"))
+			log.Println("Incorrect Url!")
+			return
 		}
 
 		// Webhook Request
@@ -83,18 +89,20 @@ func proxy(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Not able to make request!"))
-			log.Println(err)
+			log.Println("Not able to make request!")
+			return
 		}
 
 		// Calling Webhook
 		client := &http.Client{}
 		resp, err := client.Do(req)
-		defer resp.Body.Close()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("Bad Response"))
-			log.Println(err)
+			log.Println("Bad Response")
+			return
 		}
+		defer resp.Body.Close()
 
 		//Performs one Retry for retriable errors
 		for checkRetry(resp.StatusCode) {
@@ -102,7 +110,7 @@ func proxy(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte("Bad Response"))
-				log.Println(err)
+				log.Println("Bad Response")
 				break
 			}
 		}
