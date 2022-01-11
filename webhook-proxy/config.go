@@ -15,6 +15,7 @@ type Config struct {
 	RetryInterval time.Duration `json:"retry_interval"`
 }
 
+//reads data from config file
 func readConfig(f *os.File) Config {
 	decoder := json.NewDecoder(f)
 	configuration := Config{}
